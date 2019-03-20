@@ -40,23 +40,23 @@ class FaktoryClientTest {
 
     @Test
     fun whenFaktorySendsHiClientShouldSendHello() {
-        val outFromServer = ByteArrayOutputStream()
-        val faktoryResponse = ByteArrayInputStream("+HI {\"v\":2}".toByteArray())
-        every { mockedSocket.getInputStream() } returns faktoryResponse
-        every { mockedSocket.getOutputStream() } returns outFromServer
+        val fromServer = ByteArrayInputStream("+HI {\"v\":2}\n+OK".toByteArray())
+        val toServer = ByteArrayOutputStream()
+        every { mockedSocket.getInputStream() } returns fromServer
+        every { mockedSocket.getOutputStream() } returns toServer
         client.socket = mockedSocket
 
         client.connect()
 
-        Assert.assertThat(outFromServer.toString(), CoreMatchers.containsString("HELLO"))
+        Assert.assertThat(toServer.toString(), CoreMatchers.containsString("HELLO"))
     }
 
     @Test(expected = FaktoryConnectionError::class)
     fun raisesErrorWhenFaktoryDoesNotSendHi() {
-        val outFromServer = ByteArrayOutputStream()
-        val faktoryResponse = ByteArrayInputStream("NOT HI".toByteArray())
-        every { mockedSocket.getInputStream() } returns faktoryResponse
-        every { mockedSocket.getOutputStream() } returns outFromServer
+        val fromServer = ByteArrayInputStream("NOT HI".toByteArray())
+        val toServer = ByteArrayOutputStream()
+        every { mockedSocket.getInputStream() } returns fromServer
+        every { mockedSocket.getOutputStream() } returns toServer
         client.socket = mockedSocket
 
         client.connect()
