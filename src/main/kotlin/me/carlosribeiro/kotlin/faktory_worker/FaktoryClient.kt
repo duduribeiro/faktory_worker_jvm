@@ -26,6 +26,7 @@ class FaktoryClient(uri: String = System.getenv("FAKTORY_URL") ?: "tcp://localho
 
 
     private val HI_RECEIVED = Pattern.compile("\\+HI\\s\\{\\\"v\\\"\\:\\d\\}")
+    private val OK_RECEIVED = Pattern.compile("\\+OK")
     private val WID = createRandomWID()
 
     internal constructor(socket: Socket) : this() {
@@ -45,10 +46,7 @@ class FaktoryClient(uri: String = System.getenv("FAKTORY_URL") ?: "tcp://localho
         val socket = openSocket()
         inFromServer = BufferedReader(InputStreamReader(socket.getInputStream()))
         outToServer = DataOutputStream(socket.getOutputStream())
-        val response = readFromSocket()
-        System.out.println(response)
-        System.out.println(HI_RECEIVED.matcher(response).matches())
-        if (!HI_RECEIVED.matcher(response).matches()) {
+        if (!HI_RECEIVED.matcher(readFromSocket()).matches()) {
             throw FaktoryConnectionError()
         }
 
@@ -57,6 +55,9 @@ class FaktoryClient(uri: String = System.getenv("FAKTORY_URL") ?: "tcp://localho
                 put("wid", WID)
             }
         }))
+        if (!OK_RECEIVED.matcher(readFromSocket()).matches()) {
+            throw FaktoryConnectionError()
+        }
     }
 
     private fun close() {
