@@ -1,7 +1,5 @@
 package me.carlosribeiro.kotlin.faktory_worker
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.net.Socket
@@ -21,20 +19,28 @@ class FaktoryConnection(uri: String) {
     private val HI_RECEIVED = Pattern.compile("\\+HI\\s\\{\\\"v\\\"\\:\\d\\}")
     private val OK_RECEIVED = Pattern.compile("\\+OK")
 
+    private var fromServer: BufferedReader? = null
+    private var toServer: DataOutputStream? = null
+
     /**
      * Method used to connect to Faktory using a Socket.
      */
     internal fun connect() {
-        val socket = openSocket()
-        val fromServer = socket.getInputStream().bufferedReader()
-        val toServer = DataOutputStream(socket.getOutputStream())
-        if (!HI_RECEIVED.matcher(readFromSocket(fromServer)).matches()) {
+        socket = openSocket()
+        fromServer = socket?.getInputStream()?.bufferedReader()
+        toServer = DataOutputStream(socket?.getOutputStream())
+
+        if (!HI_RECEIVED.matcher(readFromSocket()).matches()) {
             throw FaktoryConnectionError()
         }
 
-        writeToSocket(toServer, "HELLO {\"v\":2}")
+        send("HELLO {\"v\":2}")
+    }
 
-        if (!OK_RECEIVED.matcher(readFromSocket(fromServer)).matches()) {
+    internal fun send(message: String) {
+        writeToSocket(message)
+        var response = readFromSocket()
+        if (!OK_RECEIVED.matcher(response).matches()) {
             throw FaktoryConnectionError()
         }
     }
@@ -43,22 +49,22 @@ class FaktoryConnection(uri: String) {
         socket?.close()
     }
 
-    private fun command(command: String, arguments: HashMap<String, Any>): String {
-        var argsInJson: String? = null
-        try {
-            argsInJson = ObjectMapper().writeValueAsString(arguments)
-            return "$command $argsInJson"
-        } catch (e: JsonProcessingException) {
-            e.printStackTrace()
-            return command
-        }
-    }
+//    private fun command(command: String, arguments: HashMap<String, Any>): String {
+//        var argsInJson: String? = null
+//        try {
+//            argsInJson = ObjectMapper().writeValueAsString(arguments)
+//            return "$command $argsInJson"
+//        } catch (e: JsonProcessingException) {
+//            e.printStackTrace()
+//            return command
+//        }
+//    }
 
     private fun openSocket(): Socket {
         return socket ?: Socket(uri.host, uri.port)
     }
 
-    private fun readFromSocket(fromServer: BufferedReader) = fromServer.readLine()
+    private fun readFromSocket() = fromServer?.readLine()
 
-    private fun writeToSocket(toServer: DataOutputStream, content: String) = toServer.writeBytes(content + "\n")
+    private fun writeToSocket(content: String) = toServer?.writeBytes(content + "\n")
 }
