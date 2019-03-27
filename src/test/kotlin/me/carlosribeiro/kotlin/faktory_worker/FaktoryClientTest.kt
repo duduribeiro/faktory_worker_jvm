@@ -13,7 +13,6 @@ import java.net.Socket
 
 class FaktoryClientTest {
     private val client = FaktoryClient()
-    private val mockedSocket = mockkClass(Socket::class)
 
     @Rule @JvmField
     val environmentVariables = EnvironmentVariables()
@@ -36,29 +35,5 @@ class FaktoryClientTest {
         val client = FaktoryClient("tcp://192.168.0.1:7419")
 
         Assert.assertEquals("tcp://192.168.0.1:7419", client.uri.toString())
-    }
-
-    @Test
-    fun whenFaktorySendsHiClientShouldSendHello() {
-        val fromServer = ByteArrayInputStream("+HI {\"v\":2}\n+OK".toByteArray())
-        val toServer = ByteArrayOutputStream()
-        every { mockedSocket.getInputStream() } returns fromServer
-        every { mockedSocket.getOutputStream() } returns toServer
-        client.socket = mockedSocket
-
-        client.connect()
-
-        Assert.assertThat(toServer.toString(), CoreMatchers.containsString("HELLO"))
-    }
-
-    @Test(expected = FaktoryConnectionError::class)
-    fun raisesErrorWhenFaktoryDoesNotSendHi() {
-        val fromServer = ByteArrayInputStream("NOT HI".toByteArray())
-        val toServer = ByteArrayOutputStream()
-        every { mockedSocket.getInputStream() } returns fromServer
-        every { mockedSocket.getOutputStream() } returns toServer
-        client.socket = mockedSocket
-
-        client.connect()
     }
 }
