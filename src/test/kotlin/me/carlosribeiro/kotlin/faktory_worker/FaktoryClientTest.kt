@@ -34,14 +34,15 @@ class FaktoryClientTest {
 
     @Test
     fun willSendAJobWithTheRighParamsToFaktory() {
-        val connection = mockk<FaktoryConnection>()
+        val connection = mockk<FaktoryConnection>(relaxed = true)
         val client = FaktoryClient(connection = connection)
         val job = FaktoryJob("FindTheRebels", 1, "luke", "leia")
-
-        every { connection.connect() } just Runs
-        every { connection.send("PUSH {\"jid\":\"${job.jid}\",\"jobtype\":\"FindTheRebels\",\"args\":[1,\"luke\",\"leia\"]}")} just Runs
-        every { connection.close() } just Runs
+        val slot = slot<String>()
 
         client.pushJob(job)
+
+        verify { connection.send(capture(slot))  }
+
+        Assert.assertEquals("""PUSH {"jid":"${job.jid}","jobType":"FindTheRebels","args":[1,"luke","leia"]}""", slot.captured)
     }
 }
