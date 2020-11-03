@@ -1,14 +1,16 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.11'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'maven'
 }
 
-group 'me.carlosribeiro.kotlin.FaktoryWorker'
+group 'me.carlosribeiro.faktoryworker'
 version '1.0.0'
 
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
