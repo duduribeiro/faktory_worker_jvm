@@ -32,9 +32,6 @@ hs_err_pid*
 
 ### Gradle ###
 .gradle
-gradle
-gradlew
-gradlew.bat
 build/
 
 # Ignore Gradle GUI config
