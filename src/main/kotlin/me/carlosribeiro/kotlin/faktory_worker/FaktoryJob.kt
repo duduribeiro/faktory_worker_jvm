@@ -2,9 +2,13 @@ package me.carlosribeiro.kotlin.faktory_worker
 
 import java.util.UUID
 
-class FaktoryJob(jobType: String, vararg args: Any) {
-    val jid: String = UUID.randomUUID().toString();
-
-    internal val jobtype = jobType
-    internal val args = args
+data class FaktoryJob(
+    val jid: String = UUID.randomUUID().toString(),
+    val jobType: String,
+    val args: List<Any>
+) {
+    constructor(jobType: String, vararg args: Any ) : this(
+        jobType = jobType,
+        args =  args.toList()
+    )
 }
