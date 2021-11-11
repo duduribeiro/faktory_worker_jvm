@@ -1,4 +1,4 @@
-package me.carlosribeiro.kotlin.faktory_worker
+package me.carlosribeiro.faktory_worker
 
 import io.mockk.every
 import io.mockk.mockkClass

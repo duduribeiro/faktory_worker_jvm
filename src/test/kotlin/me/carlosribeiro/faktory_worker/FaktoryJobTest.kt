@@ -1,4 +1,4 @@
-package me.carlosribeiro.kotlin.faktory_worker
+package me.carlosribeiro.faktory_worker
 
 import org.junit.Assert
 import org.junit.Test

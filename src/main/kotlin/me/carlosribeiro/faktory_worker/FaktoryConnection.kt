@@ -1,4 +1,4 @@
-package me.carlosribeiro.kotlin.faktory_worker
+package me.carlosribeiro.faktory_worker
 
 import java.io.BufferedReader
 import java.io.DataOutputStream
