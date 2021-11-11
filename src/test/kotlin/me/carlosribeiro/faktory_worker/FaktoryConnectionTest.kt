@@ -1,7 +1,6 @@
 package me.carlosribeiro.faktory_worker
 
-import io.mockk.every
-import io.mockk.mockkClass
+import io.mockk.*
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
 import org.junit.Test
@@ -11,7 +10,16 @@ import java.net.Socket
 
 class FaktoryConnectionTest {
     private val connection = FaktoryConnection("tcp://localhost:7419")
-    private val mockedSocket = mockkClass(Socket::class)
+    private val mockedSocket = mockk<Socket>(relaxed = true)
+
+    @Test
+    fun doesNotConnectWhenItIsAlreadyConnected() {
+        every { mockedSocket.isConnected } returns true
+
+        connection.socket = mockedSocket
+        connection.connect()
+        verify(exactly = 0) { mockedSocket.getInputStream() }
+    }
 
     @Test
     fun whenFaktorySendsHiClientShouldSendHello() {

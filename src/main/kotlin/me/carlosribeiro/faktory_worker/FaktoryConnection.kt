@@ -27,6 +27,8 @@ class FaktoryConnection(uri: String) {
      */
     internal fun connect() {
         socket = openSocket()
+        if(socket?.isConnected == true) return
+
         fromServer = socket?.getInputStream()?.bufferedReader()
         toServer = DataOutputStream(socket?.getOutputStream())
 
